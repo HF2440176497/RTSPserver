@@ -17,6 +17,11 @@ list(APPEND SOURCE_FILES
 )
 
 list(APPEND SOURCE_FILES  
+    ${CMAKE_CURRENT_SOURCE_DIR}/Live/Buffer.cpp
+    # ... 添加其他源文件  
+) 
+
+list(APPEND SOURCE_FILES  
     ${CMAKE_CURRENT_SOURCE_DIR}/Scheduler/SocketsOps.cpp
     # ... 添加其他源文件  
 ) 
