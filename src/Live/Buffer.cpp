@@ -47,4 +47,5 @@ int Buffer::read(int fd) {
 }
 
 int Buffer::write(int fd) {
+    return sockets::send(fd, peek(), readableBytes());
 }
