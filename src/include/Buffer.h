@@ -137,7 +137,7 @@ public:
      * @brief 确保有足够的空间
      */
     void ensureWritableBytes(size_t len) {
-        if (writableBytes() < len) {
+        if (writableBytes() < len) {  // when len == writable, writeindex sits at Buffer.size()
             makeSpace(len);
         }
         assert(writableBytes() >= len);
@@ -162,6 +162,9 @@ public:
         append(str.data(), str.size());
     }
 
+    /**
+     * @brief 将 data 指向区域的数据写入到 Buffer，内部保证
+    */
     void append(const char* data, size_t len) {
         ensureWritableBytes(len);
         std::copy(data, data + len, beginWrite());
@@ -192,6 +195,8 @@ private:
     std::vector<char>  mBuffer;  // mBuffer 会提供 size(), capacity() 等接口
     int                mReadIndex;
     int                mWriteIndex;
+
+public:
     static const int   kCheapPrepend = 8;
     static const int   initialSize   = 1024;
     static const char* kCRLF;
