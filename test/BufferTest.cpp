@@ -1,6 +1,7 @@
 
-#include <gtest/gtest.h>
+
 #include "Buffer.h"
+#include <gtest/gtest.h>
 
 // Buffer 测试程序
 // 测试 Buffer 各成员函数可分别进行，因此此处暂无必要使用 Test Fixtures
@@ -35,11 +36,15 @@ TEST(BufferTest, AppendRetrieve) {
 
 TEST(BufferTest, FindCRLF) {
     Buffer buf;
+    
     std::string str = std::string("This a server_test \r\n by wanghf \r\n");
     buf.append(str);
-    const char* frist_pos = &(*(str.begin() + 19));
-    const char* null = nullptr;
-    EXPECT_EQ(buf.findCRLF(), frist_pos);
+    const char* find_pos = buf.findCRLF();
+    const char* find_last_pos = buf.findLastCRLF();
+    const char* begin_pos = buf.peek();
+    // std::cout << str << std::endl;  // \r 或 \n 各自看做一个字符
+    std::cout << "Frist CRLF: " << int(find_pos-begin_pos) << std::endl;  // == 19
+    std::cout << "Last CRLF: " << int(find_last_pos-begin_pos) << std::endl;  // == 32
 }
 
 
@@ -49,11 +54,12 @@ TEST(BufferTest, MakeSpace) {
     std::string str1 = std::string(500, 'x');
     std::string str2 = std::string(800, 'y');
     buf.append(str1);
+    // 此时未引起扩容
     EXPECT_EQ(buf.readableBytes(), str1.size());
     EXPECT_EQ(buf.writableBytes(), Buffer::initialSize - str1.size());
 
     buf.append(str2);
     // initialSize = 1024 会引起扩容
     EXPECT_EQ(buf.readableBytes(), str1.size() + str2.size());
-    EXPECT_GT(buf.writableBytes(), 0);  // 此时空间增长后，应当 writeindex == size()
+    EXPECT_EQ(buf.writableBytes(), 0);  // 此时空间增长后，应当 writeindex == size()
 }

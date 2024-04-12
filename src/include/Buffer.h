@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+#include <cstring>
 #include <algorithm>
 #include <vector>
 
@@ -63,7 +63,7 @@ public:
      * @brief 默认查找范围为 [readindex, writeindex)
      */
     const char* findCRLF() const {
-        auto crlf = std::search(peek(), beginWrite(), kCRLF, kCRLF + strlen(kCRLF));
+        auto crlf = std::search(peek(), beginWrite(), kCRLF.begin(), kCRLF.end());
         return crlf == beginWrite() ? nullptr : crlf;
     }
 
@@ -74,7 +74,7 @@ public:
     const char* findCRLF(const char* start) const {
         assert(start >= peek());
         assert(start <= beginWrite());
-        auto crlf = std::search(start, beginWrite(), kCRLF, kCRLF + strlen(kCRLF));
+        auto crlf = std::search(start, beginWrite(), kCRLF.begin(), kCRLF.end());
         return crlf == beginWrite() ? nullptr : crlf;
     }
 
@@ -83,7 +83,7 @@ public:
      * @details std::search 和 std::find_end 都是在 [first, last) 区间查找
      */
     const char* findLastCRLF() const {
-        auto crlf = std::find_end(peek(), beginWrite(), kCRLF, kCRLF + strlen(kCRLF));
+        auto crlf = std::find_end(peek(), beginWrite(), kCRLF.begin(), kCRLF.end());
         return crlf == beginWrite() ? nullptr : crlf;
     }
 
@@ -134,29 +134,37 @@ public:
     }
 
     /**
-     * @brief 确保有足够的空间
+     * @brief 确保有足够的空间 append 调用
      */
     void ensureWritableBytes(size_t len) {
-        if (writableBytes() < len) {  // when len == writable, writeindex sits at Buffer.size()
+        if (writableBytes() < len) {  // when len == writable, 写入 len 会有：writeindex == Buffer.size()
             makeSpace(len);
         }
         assert(writableBytes() >= len);
     }
 
     /**
-     * @brief
+     * @brief 保证 writeable >= len
      */
     void makeSpace(size_t len) {
-        if (readableBytes() + writableBytes() < len) {
+
+        if (writableBytes() + prependableBytes() < len + kCheapPrepend) {  // 总空闲空间 < 预留空间
             mBuffer.resize(mWriteIndex + len);
-        } else {
-            assert(kCheapPrepend <= mReadIndex);  // 个人认为：== 也是可以的
+        } else {  // 预留空间足够，进行整理
+            assert(kCheapPrepend <= mReadIndex);
             auto readable_size = readableBytes();
+
             std::copy(begin() + mReadIndex, begin() + mWriteIndex, begin() + kCheapPrepend);
             mReadIndex  = kCheapPrepend;
             mWriteIndex = mReadIndex + readable_size;
+            assert(readable_size == readableBytes());
         }
     }
+    /**
+     * 测试报告：ensureWritableBytes(): assert(writableBytes() >= len); aborted
+     * 经过 makeSpace，需要保证 writableBytes() >= len
+     * 错误：resize 判断逻辑有误
+    */
 
     void append(std::string str) {
         append(str.data(), str.size());
@@ -197,9 +205,10 @@ private:
     int                mWriteIndex;
 
 public:
-    static const int   kCheapPrepend = 8;
-    static const int   initialSize   = 1024;
-    static const char* kCRLF;
+    static const int         kCheapPrepend;
+    static const int         initialSize;
+    // static const char* kCRLF;
+    static const std::string kCRLF;
 };
 
 #endif

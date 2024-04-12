@@ -1,15 +1,15 @@
 
 #include "Buffer.h"
-
 #include <sys/uio.h>
-
 #include "SocketsOps.h"
 
-const char* Buffer::kCRLF = "\r\n";
+const int         Buffer::kCheapPrepend = 8;
+const int         Buffer::initialSize   = 1024;
+const std::string Buffer::kCRLF         = "\r\n";
 
 Buffer::Buffer() : mBuffer(kCheapPrepend + initialSize),
                    mReadIndex(kCheapPrepend),
-                   mWriteIndex(kCheapPrepend) {
+                   mWriteIndex(kCheapPrepend) {  // kCheapPrepend 作为 prepend 的 size，也作为起始 index
     assert(readableBytes() == 0);
     assert(writableBytes() == initialSize);
     assert(prependableBytes() == kCheapPrepend);
@@ -44,6 +44,7 @@ int Buffer::read(int fd) {
         mWriteIndex = mBuffer.size();
         append(extrabuf, ret - writeable_size);
     }
+    return ret;
 }
 
 int Buffer::write(int fd) {

@@ -1,30 +1,22 @@
 
+# SOURCE_DIR 由项目根目录 cmake 文件定义
 
-# 初始化一个变量来存储所有的源文件  
-set(SOURCE_FILES)  
-  
-# # 递归地获取所有子目录中的源文件  
-# function(add_source_files dir)  
-#     file(GLOB_RECURSE src_list "${dir}/*.cpp")  
-#     list(APPEND SOURCE_FILES ${src_list})  
-# endfunction()
-
-# add_source_files(${CMAKE_CURRENT_SOURCE_DIR})  
+set(SOURCE_FILES)
 
 list(APPEND SOURCE_FILES  
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp  
+    ${SOURCE_DIR}/main.cpp  
     # ... 添加其他源文件  
 )
 
 list(APPEND SOURCE_FILES  
-    ${CMAKE_CURRENT_SOURCE_DIR}/Live/Buffer.cpp
+    ${SOURCE_DIR}/Live/Buffer.cpp
     # ... 添加其他源文件  
 ) 
 
 list(APPEND SOURCE_FILES  
-    ${CMAKE_CURRENT_SOURCE_DIR}/Scheduler/SocketsOps.cpp
+    ${SOURCE_DIR}/Scheduler/SocketsOps.cpp
     # ... 添加其他源文件  
-) 
+)
 
 # 添加可执行文件
 add_executable(server ${SOURCE_FILES})  

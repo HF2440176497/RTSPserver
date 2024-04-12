@@ -14,5 +14,8 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 # 头文件搜索目录
 include_directories(${PROJECT_SOURCE_DIR}/src/include)
 
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test")
+
 add_subdirectory(src)
 add_subdirectory(test)
