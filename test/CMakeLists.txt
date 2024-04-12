@@ -1,11 +1,20 @@
 
-# Google Test 测试程序
+set(TEST_SOURCE_FILES)
 
-set(TEST_SOURCE_FILES  
-    ${SOURCE_FILES}  
-    BufferTest.cpp
-    # ... test目录下的其他源文件 ...  
+list(APPEND TEST_SOURCE_FILES  
+    ${SOURCE_DIR}/Live/Buffer.cpp
+    # ... 添加其他源文件  
 ) 
+
+list(APPEND TEST_SOURCE_FILES  
+    ${SOURCE_DIR}/Scheduler/SocketsOps.cpp
+    # ... 添加其他源文件  
+) 
+
+list(APPEND TEST_SOURCE_FILES  
+    ${TEST_DIR}/BufferTest.cpp  
+    # ... 添加其他源文件  
+)
 
 add_executable(server_test ${TEST_SOURCE_FILES})  
 
